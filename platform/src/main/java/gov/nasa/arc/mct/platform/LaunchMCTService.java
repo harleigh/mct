@@ -24,7 +24,7 @@ import gov.nasa.arc.mct.components.AbstractComponent;
 import gov.nasa.arc.mct.context.GlobalContext;
 import gov.nasa.arc.mct.gui.impl.MenuExtensionManager;
 import gov.nasa.arc.mct.gui.impl.StatusAreaWidgetRegistryImpl;
-import gov.nasa.arc.mct.osgi.platform.EquinoxOSGIRuntimeImpl;
+import gov.nasa.arc.mct.osgi.platform.OSGIRuntimeImpl;
 import gov.nasa.arc.mct.osgi.platform.OSGIRuntime;
 import gov.nasa.arc.mct.platform.spi.PersistenceProvider;
 import gov.nasa.arc.mct.platform.spi.Platform;
@@ -60,6 +60,7 @@ public class LaunchMCTService {
     private boolean componentProvidersChanged = false;
     private boolean requiresRefresh = false;
     private boolean pluginsLoaded = false;
+    private boolean haveInitialized = false;
     private Timer t;
             
     public void bind(PersistenceProvider provider) {
@@ -99,12 +100,16 @@ public class LaunchMCTService {
                              requiresRefresh = true;
                              t.cancel();
                              t = null;
-                             SwingUtilities.invokeLater(new Runnable() {
-                                 @Override
-                                 public void run() {
-                                     initUserInterface();
-                                 }
-                             });
+                             if (!haveInitialized) { // Only init once
+                                 haveInitialized = true;
+                                 
+                                 SwingUtilities.invokeLater(new Runnable() {
+                                     @Override
+                                     public void run() {
+                                         initUserInterface();
+                                     }
+                                 });
+                             }
                          }
                      }
                  }
@@ -177,7 +182,7 @@ public class LaunchMCTService {
     }
     
     private void startOptionalModules() {
-        OSGIRuntime osgiRuntime = EquinoxOSGIRuntimeImpl.getOSGIRuntime();
+        OSGIRuntime osgiRuntime = OSGIRuntimeImpl.getOSGIRuntime();
         osgiRuntime.startExternalBundles();
     }
     
