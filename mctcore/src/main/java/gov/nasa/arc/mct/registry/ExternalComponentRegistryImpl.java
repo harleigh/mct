@@ -101,10 +101,7 @@ public class ExternalComponentRegistryImpl implements CoreComponentRegistry {
      * @return the default user ID
      */
     protected String getDefaultUser() {
-        if(GlobalContext.getGlobalContext().getUser() != null)
-            return GlobalContext.getGlobalContext().getUser().getUserId();
-        else
-            return null;
+        return GlobalContext.getGlobalContext().getUser().getUserId();
     }
     
     /**
@@ -423,10 +420,8 @@ public class ExternalComponentRegistryImpl implements CoreComponentRegistry {
             AbstractComponent comp = createComponent(componentType);
             ComponentInitializer ci = comp.getCapability(ComponentInitializer.class);
             String user = getDefaultUser();
-            if( user != null) {
-                ci.setCreator(user);
-                comp.setOwner(user);
-            }
+            ci.setCreator(user);
+            comp.setOwner(user);
             return comp;
             
         } catch (InstantiationException e) {
